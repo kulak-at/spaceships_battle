@@ -1,0 +1,20 @@
+{
+  "name": "spaceships_battle",
+  "version": "0.0.1",
+  "authors": [
+    "Kacper Kula <kulak@kulak.at>"
+  ],
+  "description": "Spaceship Battle game written with Phaser JS Framework.",
+  "license": "MIT",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "phaser": "~2.0.4"
+  }
+}

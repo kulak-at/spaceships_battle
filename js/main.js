@@ -41,6 +41,11 @@ SpaceShip.prototype.shot = function() {
     } else {
         bullets_t2.add(bullet);
     }
+    
+    
+    shot = game.add.audio('laser_t' + this.team);
+    shot.play('', 0, 0.2);
+    
 };
 
 SpaceShip.prototype.aimEnemy = function(enemy) {
@@ -172,6 +177,7 @@ var team1 = [];
 var team2 = [];
 var bullets_t1;
 var bullets_t2;
+var music;
 
 function preload() {
     // preloading assets
@@ -180,6 +186,9 @@ function preload() {
     game.load.image('player_t2', 'assets/enemyShip.png');
     game.load.image('bullet_t1', 'assets/laserRed.png');
     game.load.image('bullet_t2', 'assets/laserGreen.png');
+    game.load.audio('soundtrack', 'assets/soundtrack.mp3'); // TODO: convert soundtrack to ogg 'cos Firefox doesn't support mp3s
+    game.load.audio('laser_t1', 'assets/Laser1.wav');
+    game.load.audio('laser_t2', 'assets/Laser2.wav');
 }
 
 function create() {
@@ -204,6 +213,10 @@ function create() {
     // bullets group
     bullets_t1 = game.add.group();
     bullets_t2 = game.add.group();
+    
+    // audio playback
+    music = game.add.audio('soundtrack');
+    music.play('', 0, 1, true);
 }
 
 function bulletHit(ship, bullet) {

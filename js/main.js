@@ -11,6 +11,7 @@ var SpaceShip = function(game, team, config) {
     this.ship.body.immovable = false;;
     this.ship.body.collideWorldBounds = true;
     this.ship.body.bounce.setTo(1, 1); // TODO: set here some other values and move to config
+    this.ship.body.maxVelocity.setTo(300, 300);
     
     this.ship.angle = game.rnd.angle();
     this.game = game;
@@ -65,7 +66,9 @@ SpaceShip.prototype.aimEnemy = function(enemy) {
 }
 
 SpaceShip.prototype.flee = function(enemy) {
-    this.ship.rotate = 180 - this.game.physics.arcade.angleBetween(this.ship, enemy.ship);
+//    this.ship.rotate = 180 - this.game.physics.arcade.angleBetween(this.ship, enemy.ship);
+    
+    this.game.physics.arcade.accelerationFromRotation(this.ship.rotation, -200, this.ship.body.acceleration);
 }
 
 SpaceShip.prototype.accelerate = function() {
@@ -174,13 +177,28 @@ SpaceShip.prototype.damage = function() {
     // empty
 };
 
+
+
 var playerUpdate = function() {
     // empty
 };
 
 var playerDamage = function() {
-    hud[this.health].destroy();
-    hud.pop();
+    hud[this.health].kill();
+//    hud.pop();
+};
+
+var playerResurect = function() {
+    var h;
+    for(var i=0;i<hud.length, h=hud[i];i++) {
+        h.revive();
+    }
+    this.health = config.health;
+    this.alive = true;
+    this.ship.x = game.world.randomX;
+    this.ship.y = game.world.randomY;
+    this.ship.revive();
+    this.prevShot = this.game.time.now + 5000; // shooting penalty after revive 
 };
         
 var game;
@@ -261,6 +279,8 @@ function create() {
     player = new SpaceShip(game, 1, config);
     player.update = playerUpdate;
     player.damage = playerDamage;
+    player.resurect = playerResurect;
+    // TODO: change prototypes to function inheritance.
     player.x = 1000;
     player.y = 1000;
     
@@ -357,8 +377,12 @@ function updateDetachedCamera() {
         player.ship.body.acceleration.set(0);
     }
     
-    if(game.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR) && player.alive) {
-        player.shot();
+    if(game.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR)) {
+        if(player.alive) {
+            player.shot();
+        } else {
+            player.resurect();
+        }
     }
     
 //    if(cursors.down.isDown) {

@@ -216,12 +216,14 @@ var hud = [];
 
 function preload() {
     // preloading assets
-    game.load.image('bg_stars', 'assets/starBackground.png');
+    game.load.image('bg_stars' , 'assets/starBackground.png');
     game.load.image('player_t1', 'assets/player.png');
     game.load.image('player_t2', 'assets/enemyShip.png');
     game.load.image('bullet_t1', 'assets/laserRed.png');
     game.load.image('bullet_t2', 'assets/laserGreen.png');
-    game.load.image('hud_life',  'assets/life.png');
+    game.load.image('shot_t1'  , 'assets/laserRedShot.png');
+    game.load.image('shot_t2'  , 'assets/laserGreenShot.png');
+    game.load.image('hud_life' , 'assets/life.png');
     
     game.load.audio('soundtrack', 'assets/soundtrack.mp3'); // TODO: convert soundtrack to ogg 'cos Firefox doesn't support mp3s
     game.load.audio('laser_t1', 'assets/Laser1.wav');
@@ -279,7 +281,17 @@ function render_hud() {
 }
 
 function bulletHit(ship, bullet) {
+    console.log(this.team);
+    var hit = game.add.sprite(bullet.x, bullet.y, 'shot_t' + ((this.team % 2) + 1) );
+//    hit.x = bullet.x;
+//    hit.y = bullet.y;
+    
+    setTimeout(function() {
+        hit.destroy();
+    }, 100);
+    
     bullet.kill();
+    
     this.health--;
     this.damage();
     

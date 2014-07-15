@@ -148,7 +148,20 @@ SpaceShip.prototype.collideWithOne = function(arr) {
     for(var i in arr) {
         this.game.physics.arcade.collide(this.ship, arr[i].ship);
     }
-}
+};
+
+SpaceShip.prototype.damage = function() {
+    // empty
+};
+
+var playerUpdate = function() {
+    // empty
+};
+
+var playerDamage = function() {
+    hud[this.health].destroy();
+    hud.pop();
+};
         
 var game;
 document.addEventListener('DOMContentLoaded', function(){
@@ -160,7 +173,7 @@ document.addEventListener('DOMContentLoaded', function(){
 var config = {
     cameraMovementDiff: 4,
     teamPlayersCount: 100,
-    health: 3,
+    health: 5,
     bulletLifespan: 500,
     bulletSpeed: 900,
     baseVelocity: 350,
@@ -178,6 +191,8 @@ var team2 = [];
 var bullets_t1;
 var bullets_t2;
 var music;
+var player;
+var hud = [];
 
 function preload() {
     // preloading assets
@@ -186,6 +201,8 @@ function preload() {
     game.load.image('player_t2', 'assets/enemyShip.png');
     game.load.image('bullet_t1', 'assets/laserRed.png');
     game.load.image('bullet_t2', 'assets/laserGreen.png');
+    game.load.image('hud_life',  'assets/life.png');
+    
     game.load.audio('soundtrack', 'assets/soundtrack.mp3'); // TODO: convert soundtrack to ogg 'cos Firefox doesn't support mp3s
     game.load.audio('laser_t1', 'assets/Laser1.wav');
     game.load.audio('laser_t2', 'assets/Laser2.wav');
@@ -217,12 +234,33 @@ function create() {
     // audio playback
     music = game.add.audio('soundtrack');
     music.play('', 0, 1, true);
+    
+    // player
+    player = new SpaceShip(game, 1, config);
+    player.update = playerUpdate;
+    player.damage = playerDamage;
+    
+    game.camera.follow(player.ship);
+    team1.push(player);
+    
+    render_hud();
+    
+}
+
+function render_hud() {
+    
+    for(var i=0;i<config.health;i++) {
+        var life = game.add.sprite(i*50 + 10, 10, 'hud_life');
+        life.fixedToCamera = true;
+        hud.push(life);
+    }
 }
 
 function bulletHit(ship, bullet) {
     bullet.kill();
     this.health--;
-    console.log(this.health);
+    this.damage();
+    
     if(this.health <= 0) {
         ship.kill();
         this.alive = false;
@@ -264,21 +302,32 @@ function render() {
 function updateDetachedCamera() {
     var diff = config.cameraMovementDiff;
     if(cursors.left.isDown) {
-        game.camera.x -= diff;
-    }
-    
-    if(cursors.right.isDown) {
-        game.camera.x += diff;
+//        game.camera.x -= diff;
+        player.ship.body.angularVelocity = -300;
+    } else if(cursors.right.isDown) {
+//        game.camera.x += diff;
+        player.ship.body.angularVelocity = 300;
+    } else {
+        player.ship.body.angularVelocity = 0;
     }
     
     if(cursors.up.isDown) {
-        game.camera.y -= diff;
+        game.physics.arcade.accelerationFromRotation(player.ship.rotation, 200, player.ship.body.acceleration);
+    } else {
+        player.ship.body.acceleration.set(0);
     }
     
-    if(cursors.down.isDown) {
-        game.camera.y += diff;
+    if(game.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR) && player.alive) {
+        player.shot();
     }
     
-    land.tilePosition.x = -game.camera.x;
-    land.tilePosition.y = -game.camera.y;
+//    if(cursors.down.isDown) {
+//        game.camera.y += diff;
+//    }
+    
+//    game.camera.x = player.ship.x;
+    land.tilePosition.x = -player.ship.x;
+    
+//    game.camera.y = player.ship.y;
+    land.tilePosition.y = -player.ship.y;
 }

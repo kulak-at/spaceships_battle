@@ -239,6 +239,8 @@ function create() {
     player = new SpaceShip(game, 1, config);
     player.update = playerUpdate;
     player.damage = playerDamage;
+    player.x = 1000;
+    player.y = 1000;
     
     game.camera.follow(player.ship);
     team1.push(player);
@@ -313,6 +315,8 @@ function updateDetachedCamera() {
     
     if(cursors.up.isDown) {
         game.physics.arcade.accelerationFromRotation(player.ship.rotation, 200, player.ship.body.acceleration);
+    } else if(cursors.down.isDown) {
+        game.physics.arcade.accelerationFromRotation(player.ship.rotation, -200, player.ship.body.acceleration);
     } else {
         player.ship.body.acceleration.set(0);
     }

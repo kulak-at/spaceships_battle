@@ -283,6 +283,10 @@ function render_hud() {
 function bulletHit(ship, bullet) {
     console.log(this.team);
     var hit = game.add.sprite(bullet.x, bullet.y, 'shot_t' + ((this.team % 2) + 1) );
+    hit.anchor.set(0.5);
+    hit.scale.x = 0.1;
+    hit.scale.y = 0.1;
+    game.add.tween(hit.scale).to({x:1, y: 1}, 100, Phaser.Easing.Linear.None, true, 0, 0, false);
 //    hit.x = bullet.x;
 //    hit.y = bullet.y;
     

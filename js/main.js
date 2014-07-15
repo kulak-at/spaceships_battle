@@ -70,22 +70,42 @@ SpaceShip.prototype.flee = function(enemy) {
 
 SpaceShip.prototype.accelerate = function() {
     // accelerate
-    if(this.game.rnd.frac() > 0.4) {
-        this.game.physics.arcade.velocityFromAngle(this.ship.angle, config.baseVelocity, this.ship.body.velocity);
+    var rand = this.game.rnd.frac();
+    if(rand > 0.4) {
+//        this.game.physics.arcade.velocityFromAngle(this.ship.angle, config.baseVelocity, this.ship.body.velocity);
+            this.game.physics.arcade.accelerationFromRotation(this.ship.rotation, 200, this.ship.body.acceleration);
+    } else if(rand < 0.2) {
+            this.game.physics.arcade.accelerationFromRotation(this.ship.rotation, -200, this.ship.body.acceleration);
     } else {
-        this.ship.body.velocity.set( this.ship.body.velocity - 0.0005);
+//        this.ship.body.velocity.set( this.ship.body.velocity - 0.0005);
 //        this.ship.body.acceleration.set(0);
+        
+        this.ship.body.acceleration.set(0);
     }
 }
 
 SpaceShip.prototype.rotate = function() {
-    // rotate randomly in range (curr - diff , curr + diff) deg
-    var diff = 0.1;
-    var rot_min = Math.max(-180, this.ship.rotation - diff);
-    var rot_max = Math.min(180, this.ship.rotation + 2 * diff);
+//    // rotate randomly in range (curr - diff , curr + diff) deg
+//    var diff = 0.1;
+//    var rot_min = Math.max(-180, this.ship.rotation - diff);
+//    var rot_max = Math.min(180, this.ship.rotation + 2 * diff);
+//    if(this.game.rnd.frac() > 0.7) {
+//        this.ship.rotation = this.game.rnd.realInRange(rot_min, rot_max);
+//    }
+    
     if(this.game.rnd.frac() > 0.7) {
-        this.ship.rotation = this.game.rnd.realInRange(rot_min, rot_max);
+        // doing rotation
+        if(this.game.rnd.frac() > 0.5) {
+            this.ship.body.angularVelocity = this.game.rnd.integerInRange(100, 400);
+        } else {
+            this.ship.body.angularVelocity = this.game.rnd.integerInRange(-400, -100);
+        }
+    } else {
+        this.ship.body.angularVelocity = 0;
     }
+    
+//    game.physics.arcade.accelerationFromddRotation(player.ship.rotation, 200, player.ship.body.acceleration);
+    
 }
 
 SpaceShip.prototype.changeParams = function() {

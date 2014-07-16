@@ -45,7 +45,7 @@ SpaceShip.prototype.shot = function() {
     
     
     shot = game.add.audio('laser_t' + this.team);
-    shot.play('', 0, 0.2);
+    shot.play('', 0, 0.1);
     
 };
 
@@ -297,6 +297,29 @@ function create() {
     render_hud();
     createMenuHud();
     
+    setTimeout(resurectTeamMember.bind(this, team1), game.rnd.integerInRange(2000, 10000));
+    setTimeout(resurectTeamMember.bind(this, team2), game.rnd.integerInRange(2000, 10000));
+    
+}
+
+function resurectTeamMember(team) {
+    
+    for(var i=0, ship; i< team.length, ship = team[i]; i++) {
+        if(!ship.alive && ship !== player) {
+            // resurecting
+            ship.alive = true;
+            ship.ship.revive();
+            ship.health = config.health;
+            
+            ship.ship.x = game.world.randomX;
+            ship.ship.y = game.world.randomY;
+            ship.prevShot = this.game.time.now + 1000;
+            break;
+        }
+    }
+    
+    setTimeout(resurectTeamMember.bind(this, team), game.rnd.integerInRange(2000, 10000));
+    
 }
 
 function render_hud() {
@@ -310,7 +333,6 @@ function render_hud() {
 }
 
 function bulletHit(ship, bullet) {
-    console.log(this.team);
     var hit = game.add.sprite(bullet.x, bullet.y, 'shot_t' + ((this.team % 2) + 1) );
     hit.anchor.set(0.5);
     hit.scale.x = 0.1;

@@ -9,6 +9,7 @@
   "author": "Kacper Kula <kulak@kulak.at>",
   "license": "MIT",
   "dependencies": {
-    "grunt": "^0.4.5"
+    "grunt": "^0.4.5",
+    "grunt-connect": "^0.2.0"
   }
 }

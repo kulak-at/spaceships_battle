@@ -7,7 +7,10 @@ var update = function() {
 };
 
 var damage = function() {
-    hud[this.health].kill();
+    if(this.health >= 0) {
+        hud[this.health].kill();
+    }
+    
     if(this.health <= 0) {
         this.menu_group.alpha = 1;
     }
@@ -50,7 +53,7 @@ var PlayerSpaceShip = function(game, team, config, bullets, menu_group) {
     ship.render_hud = render_hud;
     ship.menu_group = menu_group;
     ship.render_hud();
-    ship.ship.tint = 0xffaa00;
+    ship.ship.tint = config.playerTint;
     
     return ship;
     

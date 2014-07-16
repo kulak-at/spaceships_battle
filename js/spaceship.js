@@ -1,14 +1,10 @@
 var shot = function() {
     
-//    console.log(this);
-    
     if(this.prevShot + this.config.gunCooldownTime > this.game.time.now) {
         return; // gun is still cooling down.
     }
     this.prevShot = this.game.time.now;
     var bullet = this.game.add.sprite(this.ship.x, this.ship.y, 'bullet_t' + this.team);
-//    bullet.enableBody = true;
-//    bullet.physicsBodyType = Phaser.Physics.ARCADE;
     bullet.anchor.x = 0.5;
     bullet.anchor.y = 0.5;
     bullet.lifespan = this.config.bulletLifespan;
@@ -16,14 +12,9 @@ var shot = function() {
     bullet.alive = true;
     this.game.physics.enable(bullet, Phaser.Physics.ARCADE);
     this.ship.body.collideWorldBounds = true;
-    this.game.physics.arcade.velocityFromRotation(bullet.rotation, this.config.bulletSpeed, bullet.body.velocity); // move bullet velocity to config.
-//    if(this.team === 1) {
+    this.game.physics.arcade.velocityFromRotation(bullet.rotation, this.config.bulletSpeed, bullet.body.velocity);
     this.bullets.add(bullet);
-//    } else {
-//        this.bullets_t2.add(bullet);
-//    }
-    
-    
+
     shot = this.game.add.audio('laser_t' + this.team);
     shot.play('', 0, 0.1);
 };
@@ -38,12 +29,8 @@ var aimEnemy = function(enemy) {
         this.data = this.data; // not chaning, just to show we still need this data.
         return;
     }
-    
     // shoting
     this.shot();
-    
-    
-    
 };
 
 
@@ -54,14 +41,10 @@ var flee = function(enemy) {
 var accelerate = function() {
     var rand = this.game.rnd.frac();
     if(rand > 0.4) {
-//        this.game.physics.arcade.velocityFromAngle(this.ship.angle, config.baseVelocity, this.ship.body.velocity);
-            this.game.physics.arcade.accelerationFromRotation(this.ship.rotation, 200, this.ship.body.acceleration);
+        this.game.physics.arcade.accelerationFromRotation(this.ship.rotation, 200, this.ship.body.acceleration);
     } else if(rand < 0.2) {
-            this.game.physics.arcade.accelerationFromRotation(this.ship.rotation, -200, this.ship.body.acceleration);
+        this.game.physics.arcade.accelerationFromRotation(this.ship.rotation, -200, this.ship.body.acceleration);
     } else {
-//        this.ship.body.velocity.set( this.ship.body.velocity - 0.0005);
-//        this.ship.body.acceleration.set(0);
-        
         this.ship.body.acceleration.set(0);
     }
 };
@@ -85,7 +68,7 @@ var changeParams = function() {
 };
 
 var update = function(enemies) {
-    // logic for movement and aiming an enemyS
+    // logic for movement and aiming an enemies
     
     this.changeParams();
     
@@ -110,22 +93,19 @@ var update = function(enemies) {
         }
     }
     
-    if(this.game.rnd.frac() > 0.999) {
+    if(this.game.rnd.frac() > 0.9999) {
         this.shot(); // shoting randomly
     }
     
     for(var i in enemies) {
         var enemy = enemies[i];
         
-        if(this.game.physics.arcade.distanceBetween(this.ship, enemy.ship) < 200) { // TODO: move to config
+        if(this.game.physics.arcade.distanceBetween(this.ship, enemy.ship) < this.config.thresholdFollow) {
             this.state = 'following';
             this.data = enemy;
             break; // following the first one.
         }
     }
-    
-    
-    
 };
 
 
@@ -146,8 +126,6 @@ var damage = function() {
     // empty
 };
 
-
-
 var SpaceShip = function(game, team, config, bullets) {
     
     var ship = {};
@@ -164,15 +142,13 @@ var SpaceShip = function(game, team, config, bullets) {
     ship.game.physics.enable(ship.ship, Phaser.Physics.ARCADE);
     ship.ship.body.immovable = false;;
     ship.ship.body.collideWorldBounds = true;
-    ship.ship.body.bounce.setTo(1, 1); // TODO: set here some other values and move to config
-    ship.ship.body.maxVelocity.setTo(300, 300);
+    ship.ship.body.bounce.setTo(config.shipBounce, config.shipBounce);
+    ship.ship.body.maxVelocity.setTo(config.shipMaxVelocity, config.shipMaxVelocity);
     
     ship.ship.angle = game.rnd.angle();
     ship.game = game;
     ship.prevShot = 0;
     ship.bullets = bullets;
-    
-//    game.physics.arcade.velocityFromRotation(this.ship.rotation, 100, this.ship.body.velocity); // TODO: move to config
     
     ship.state = 'idle';
     
@@ -190,47 +166,5 @@ var SpaceShip = function(game, team, config, bullets) {
     
     return ship;
 };
-
-
-//
-//SpaceShip.prototype.shot = function() {
-//    
-//    
-//};
-//
-//SpaceShip.prototype.aimEnemy = function(enemy) {
-//    
-//}
-//
-//SpaceShip.prototype.flee = function(enemy) {
-////    this.ship.rotate = 180 - this.game.physics.arcade.angleBetween(this.ship, enemy.ship);
-//    
-//}
-//
-//SpaceShip.prototype.accelerate = function() {
-//    // accelerate
-//    
-//}
-//
-//SpaceShip.prototype.rotate = function() {
-////    // rotate randomly in range (curr - diff , curr + diff) deg
-////    var diff = 0.1;
-////    var rot_min = Math.max(-180, this.ship.rotation - diff);
-////    var rot_max = Math.min(180, this.ship.rotation + 2 * diff);
-////    if(this.game.rnd.frac() > 0.7) {
-////        this.ship.rotation = this.game.rnd.realInRange(rot_min, rot_max);
-////    }
-//    
-//    
-//    
-////    game.physics.arcade.accelerationFromddRotation(player.ship.rotation, 200, player.ship.body.acceleration);
-//    
-//}
-//
-//SpaceShip.prototype.changeParams = function() {
-//}
-
-
-
 
 module.exports = SpaceShip;

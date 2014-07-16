@@ -1,6 +1,5 @@
 module.exports = {
-    cameraMovementDiff: 4,
-    teamPlayersCount: 100,
+    teamPlayersCount: 50,
     health: 5,
     bulletLifespan: 500,
     bulletSpeed: 900,
@@ -8,5 +7,13 @@ module.exports = {
     gunCooldownTime: 300, // in miliseconds
     thresholdFlee: 100,
     thresholdLost: 300,
-    thresholdFleed: 500
+    thresholdFleed: 500,
+    thresholdFollow: 200,
+    shipBounce: 0.6,
+    shipMaxVelocity: 300,
+    playerTint: 0xffaa00,
+    textTitle: "SpaceShips Battle",
+    textCommand: "Press Space to start",
+    playerAngularVelocity: 300,
+    playerAcceleration: 200
 };

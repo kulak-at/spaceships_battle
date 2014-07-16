@@ -1,15 +1,12 @@
 var SpaceShip = require('./spaceship.js');
 var PlayerSpaceShip = require('./playerspaceship.js');
-
+var config = require('./config.js');
         
 var game;
 document.addEventListener('DOMContentLoaded', function(){
     game = new Phaser.Game(document.body.clientWidth, document.body.clientHeight, Phaser.AUTO, null, { preload: preload, create: create, update: update, render: render });
-    window.game = game;
 });
 
-
-var config = require('./config.js');
 
 var cursors;
 var land;
@@ -20,8 +17,6 @@ var bullets_t1;
 var bullets_t2;
 var music;
 var player;
-var hud = [];
-var menu_text;
 var menu_group;
 
 function preload() {
@@ -130,8 +125,8 @@ function bulletHit(ship, bullet) {
 
 function update() {
     
-    // detached camera
-    updateDetachedCamera();
+    // player movement
+    calculatePlayerMovements();
     
     for(var i in team1) {
         var ship = team1[i];
@@ -176,8 +171,8 @@ function render() {
 }
 
 function createMenuHud() {
-    menu_text = game.add.text(game.width/2, game.height/2, "Press Space to start", { font: '30px Arial', fill: '#fff'});
-    var gameTitle = game.add.text(game.width / 2, (game.height / 2) - menu_text.height - 50, "SpaceShips Battle", { font: '60px Arial', fill: '#fff'});
+    var menu_text = game.add.text(game.width/2, game.height/2, config.textCommand, { font: '30px Arial', fill: '#fff'});
+    var gameTitle = game.add.text(game.width / 2, (game.height / 2) - menu_text.height - 50, config.textTitle, { font: '60px Arial', fill: '#fff'});
 
     menu_text.anchor.setTo(0.5, 0.5);
     gameTitle.anchor.setTo(0.5, 0.5);
@@ -188,22 +183,22 @@ function createMenuHud() {
     menu_group.add(menu_text);
 }
 
-function updateDetachedCamera() {
-    var diff = config.cameraMovementDiff;
+function calculatePlayerMovements() {
+    var angularVelocity = config.playerAngularVelocity;
+    var acceleration = config.playerAcceleration;
+    
     if(cursors.left.isDown) {
-//        game.camera.x -= diff;
-        player.ship.body.angularVelocity = -300;
+        player.ship.body.angularVelocity = -1 * angularVelocity;
     } else if(cursors.right.isDown) {
-//        game.camera.x += diff;
-        player.ship.body.angularVelocity = 300;
+        player.ship.body.angularVelocity = angularVelocity;
     } else {
         player.ship.body.angularVelocity = 0;
     }
     
     if(cursors.up.isDown) {
-        game.physics.arcade.accelerationFromRotation(player.ship.rotation, 200, player.ship.body.acceleration);
+        game.physics.arcade.accelerationFromRotation(player.ship.rotation, acceleration, player.ship.body.acceleration);
     } else if(cursors.down.isDown) {
-        game.physics.arcade.accelerationFromRotation(player.ship.rotation, -200, player.ship.body.acceleration);
+        game.physics.arcade.accelerationFromRotation(player.ship.rotation, -1 * acceleration, player.ship.body.acceleration);
     } else {
         player.ship.body.acceleration.set(0);
     }
@@ -216,14 +211,7 @@ function updateDetachedCamera() {
             menu_group.alpha = 0;
         }
     }
-    
-//    if(cursors.down.isDown) {
-//        game.camera.y += diff;
-//    }
-    
-//    game.camera.x = player.ship.x;
+
     land.tilePosition.x = -player.ship.x;
-    
-//    game.camera.y = player.ship.y;
     land.tilePosition.y = -player.ship.y;
 }

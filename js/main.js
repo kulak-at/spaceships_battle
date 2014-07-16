@@ -1,208 +1,6 @@
-var SpaceShip = function(game, team, config) {
-    var x = game.world.randomX;
-    var y = game.world.randomY;
-    this.game = game;
-    this.health = config.health;
-    this.alive = true;
-    this.team = team;
-    this.ship = game.add.sprite(x, y, 'player_t' + team);
-    this.ship.anchor.set(0.5, 0.5);
-    game.physics.enable(this.ship, Phaser.Physics.ARCADE);
-    this.ship.body.immovable = false;;
-    this.ship.body.collideWorldBounds = true;
-    this.ship.body.bounce.setTo(1, 1); // TODO: set here some other values and move to config
-    this.ship.body.maxVelocity.setTo(300, 300);
-    
-    this.ship.angle = game.rnd.angle();
-    this.game = game;
-    this.prevShot = 0;
-    
-//    game.physics.arcade.velocityFromRotation(this.ship.rotation, 100, this.ship.body.velocity); // TODO: move to config
-    
-    this.state = 'idle';
-};
+var SpaceShip = require('./spaceship.js');
+var PlayerSpaceShip = require('./playerspaceship.js');
 
-SpaceShip.prototype.shot = function() {
-    if(this.prevShot + config.gunCooldownTime > this.game.time.now) {
-        return; // gun is still cooling down.
-    }
-    this.prevShot = this.game.time.now;
-    var bullet = game.add.sprite(this.ship.x, this.ship.y, 'bullet_t' + this.team);
-//    bullet.enableBody = true;
-//    bullet.physicsBodyType = Phaser.Physics.ARCADE;
-    bullet.anchor.x = 0.5;
-    bullet.anchor.y = 0.5;
-    bullet.lifespan = config.bulletLifespan;
-    bullet.rotation = this.ship.rotation;
-    game.physics.enable(bullet, Phaser.Physics.ARCADE);
-    this.ship.body.collideWorldBounds = true;
-    this.game.physics.arcade.velocityFromRotation(bullet.rotation, config.bulletSpeed, bullet.body.velocity); // move bullet velocity to config.
-    if(this.team === 1) {
-        bullets_t1.add(bullet);
-    } else {
-        bullets_t2.add(bullet);
-    }
-    
-    
-    shot = game.add.audio('laser_t' + this.team);
-    shot.play('', 0, 0.1);
-    
-};
-
-SpaceShip.prototype.aimEnemy = function(enemy) {
-    this.ship.rotation = this.game.physics.arcade.angleBetween(this.ship, enemy.ship);
-    if(game.physics.arcade.distanceBetween(this.ship, enemy.ship) < config.thresholdFlee) {
-        // too close
-        this.ship.rotation = - this.ship.rotation;
-        this.state = 'flee';
-        this.data = this.data; // not chaning, just to show we still need this data.
-        return;
-    }
-    
-    // shoting
-    this.shot();
-    
-    
-}
-
-SpaceShip.prototype.flee = function(enemy) {
-//    this.ship.rotate = 180 - this.game.physics.arcade.angleBetween(this.ship, enemy.ship);
-    
-    this.game.physics.arcade.accelerationFromRotation(this.ship.rotation, -200, this.ship.body.acceleration);
-}
-
-SpaceShip.prototype.accelerate = function() {
-    // accelerate
-    var rand = this.game.rnd.frac();
-    if(rand > 0.4) {
-//        this.game.physics.arcade.velocityFromAngle(this.ship.angle, config.baseVelocity, this.ship.body.velocity);
-            this.game.physics.arcade.accelerationFromRotation(this.ship.rotation, 200, this.ship.body.acceleration);
-    } else if(rand < 0.2) {
-            this.game.physics.arcade.accelerationFromRotation(this.ship.rotation, -200, this.ship.body.acceleration);
-    } else {
-//        this.ship.body.velocity.set( this.ship.body.velocity - 0.0005);
-//        this.ship.body.acceleration.set(0);
-        
-        this.ship.body.acceleration.set(0);
-    }
-}
-
-SpaceShip.prototype.rotate = function() {
-//    // rotate randomly in range (curr - diff , curr + diff) deg
-//    var diff = 0.1;
-//    var rot_min = Math.max(-180, this.ship.rotation - diff);
-//    var rot_max = Math.min(180, this.ship.rotation + 2 * diff);
-//    if(this.game.rnd.frac() > 0.7) {
-//        this.ship.rotation = this.game.rnd.realInRange(rot_min, rot_max);
-//    }
-    
-    if(this.game.rnd.frac() > 0.7) {
-        // doing rotation
-        if(this.game.rnd.frac() > 0.5) {
-            this.ship.body.angularVelocity = this.game.rnd.integerInRange(100, 400);
-        } else {
-            this.ship.body.angularVelocity = this.game.rnd.integerInRange(-400, -100);
-        }
-    } else {
-        this.ship.body.angularVelocity = 0;
-    }
-    
-//    game.physics.arcade.accelerationFromddRotation(player.ship.rotation, 200, player.ship.body.acceleration);
-    
-}
-
-SpaceShip.prototype.changeParams = function() {
-    this.rotate();
-    this.accelerate();
-}
-
-SpaceShip.prototype.update = function(enemies) {
-    // logic for movement and aiming an enemyS
-    
-    this.changeParams();
-    
-    if(this.state === 'following') {
-        if(game.physics.arcade.distanceBetween(this.ship, this.data.ship) > config.thresholdLost) {
-            // ship lost
-            this.state = 'idle';
-            this.data = null;
-        } else {
-            this.aimEnemy(this.data);
-        }
-    }
-    
-    if(this.state === 'flee') {
-        if(game.physics.arcade.distanceBetween(this.ship, this.data.ship) > config.thresholdFleed) {
-            // successfuly fleed
-            this.state = 'idle';
-            this.data = null;
-        } else {
-            this.flee(this.data);
-            return;
-        }
-    }
-    
-    if(this.game.rnd.frac() > 0.999) {
-        this.shot(); // shoting randomly
-    }
-    
-    for(var i in enemies) {
-        var enemy = enemies[i];
-        
-        if(game.physics.arcade.distanceBetween(this.ship, enemy.ship) < 200) { // TODO: move to config
-            this.state = 'following';
-            this.data = enemy;
-            break; // following the first one.
-        }
-    }
-    
-    
-    
-};
-
-SpaceShip.prototype.collideWith = function() {
-    var args = Array.prototype.slice.call(arguments);
-    for(var i in args) {
-        this.collideWithOne(args[i]);
-    }
-};
-
-SpaceShip.prototype.collideWithOne = function(arr) {
-    for(var i in arr) {
-        this.game.physics.arcade.collide(this.ship, arr[i].ship);
-    }
-};
-
-SpaceShip.prototype.damage = function() {
-    // empty
-};
-
-
-
-var playerUpdate = function() {
-    // empty
-};
-
-var playerDamage = function() {
-    hud[this.health].kill();
-    if(this.health <= 0) {
-        menu_group.alpha = 1;
-    }
-//    hud.pop();
-};
-
-var playerResurect = function() {
-    var h;
-    for(var i=0;i<hud.length, h=hud[i];i++) {
-        h.revive();
-    }
-    this.health = config.health;
-    this.alive = true;
-    this.ship.x = game.world.randomX;
-    this.ship.y = game.world.randomY;
-    this.ship.revive();
-    this.prevShot = this.game.time.now + 1000; // shooting penalty after revive 
-};
         
 var game;
 document.addEventListener('DOMContentLoaded', function(){
@@ -211,18 +9,7 @@ document.addEventListener('DOMContentLoaded', function(){
 
 
 
-var config = {
-    cameraMovementDiff: 4,
-    teamPlayersCount: 100,
-    health: 5,
-    bulletLifespan: 500,
-    bulletSpeed: 900,
-    baseVelocity: 350,
-    gunCooldownTime: 300, // in miliseconds
-    thresholdFlee: 100,
-    thresholdLost: 300,
-    thresholdFleed: 500
-};
+var config = require('./config.js');
 
 var cursors;
 var land;
@@ -262,40 +49,33 @@ function create() {
     // cursors object
     cursors = game.input.keyboard.createCursorKeys();
     
-    // creating teams
-    var k = config.teamPlayersCount;
-    while(k--) {
-        team1.push(new SpaceShip(game, 1, config));
-    }
-    k = config.teamPlayersCount;
-    while(k--) {
-        team2.push(new SpaceShip(game, 2, config));
-    }
-    
     // bullets group
     bullets_t1 = game.add.group();
     bullets_t2 = game.add.group();
+    
+    // creating teams
+    var k = config.teamPlayersCount;
+    while(k--) {
+        team1.push(new SpaceShip(game, 1, config, bullets_t1));
+    }
+    k = config.teamPlayersCount;
+    while(k--) {
+        team2.push(new SpaceShip(game, 2, config, bullets_t2));
+    }
     
     // audio playback
     music = game.add.audio('soundtrack');
     music.play('', 0, 1, true);
     
-    // player
-    player = new SpaceShip(game, 1, config);
-    player.update = playerUpdate;
-    player.damage = playerDamage;
-    player.resurect = playerResurect;
-    // TODO: change prototypes to function inheritance.
+    createMenuHud();
     
-    player.alive = false;
-    player.ship.kill();
+    // player
+    player = new PlayerSpaceShip(game, 1, config, bullets_t1, menu_group);
     
     
     game.camera.follow(player.ship);
     team1.push(player);
     
-    render_hud();
-    createMenuHud();
     
     setTimeout(resurectTeamMember.bind(this, team1), game.rnd.integerInRange(2000, 10000));
     setTimeout(resurectTeamMember.bind(this, team2), game.rnd.integerInRange(2000, 10000));
@@ -320,16 +100,6 @@ function resurectTeamMember(team) {
     
     setTimeout(resurectTeamMember.bind(this, team), game.rnd.integerInRange(2000, 10000));
     
-}
-
-function render_hud() {
-    
-    for(var i=0;i<config.health;i++) {
-        var life = game.add.sprite(i*50 + 10, 10, 'hud_life');
-        life.fixedToCamera = true;
-        life.kill();
-        hud.push(life);
-    }
 }
 
 function bulletHit(ship, bullet) {

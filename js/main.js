@@ -115,7 +115,9 @@ function bulletHit(ship, bullet) {
         hit.destroy();
     }, 100);
     
-    bullet.kill();
+    bullet.destroy();
+    bullets_t1.remove(bullet);
+    bullets_t2.remove(bullet);
     
     this.health--;
     this.damage();
@@ -152,6 +154,21 @@ function update() {
         ship.update(team1);
     }
     
+    // remove dead bullets
+    
+    var rmDead = function(child) {
+        if(child === undefined || child.alive) {
+            return;
+        }
+        this.remove(child);
+    };
+    if(bullets_t1.countDead()) {
+        bullets_t1.forEach(rmDead, bullets_t1);
+    }
+    
+    if(bullets_t2.countDead()) {
+        bullets_t2.forEach(rmDead, bullets_t2);
+    }
 }
 
 function render() {

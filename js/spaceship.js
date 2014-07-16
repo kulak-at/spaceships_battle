@@ -13,6 +13,7 @@ var shot = function() {
     bullet.anchor.y = 0.5;
     bullet.lifespan = this.config.bulletLifespan;
     bullet.rotation = this.ship.rotation;
+    bullet.alive = true;
     this.game.physics.enable(bullet, Phaser.Physics.ARCADE);
     this.ship.body.collideWorldBounds = true;
     this.game.physics.arcade.velocityFromRotation(bullet.rotation, this.config.bulletSpeed, bullet.body.velocity); // move bullet velocity to config.

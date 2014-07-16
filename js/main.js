@@ -5,8 +5,8 @@ var PlayerSpaceShip = require('./playerspaceship.js');
 var game;
 document.addEventListener('DOMContentLoaded', function(){
     game = new Phaser.Game(document.body.clientWidth, document.body.clientHeight, Phaser.AUTO, null, { preload: preload, create: create, update: update, render: render });
+    window.game = game;
 });
-
 
 
 var config = require('./config.js');

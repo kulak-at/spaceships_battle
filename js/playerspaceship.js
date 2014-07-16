@@ -50,6 +50,7 @@ var PlayerSpaceShip = function(game, team, config, bullets, menu_group) {
     ship.render_hud = render_hud;
     ship.menu_group = menu_group;
     ship.render_hud();
+    ship.ship.tint = 0xffaa00;
     
     return ship;
     

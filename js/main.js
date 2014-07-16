@@ -185,6 +185,9 @@ var playerUpdate = function() {
 
 var playerDamage = function() {
     hud[this.health].kill();
+    if(this.health <= 0) {
+        menu_group.alpha = 1;
+    }
 //    hud.pop();
 };
 
@@ -198,7 +201,7 @@ var playerResurect = function() {
     this.ship.x = game.world.randomX;
     this.ship.y = game.world.randomY;
     this.ship.revive();
-    this.prevShot = this.game.time.now + 5000; // shooting penalty after revive 
+    this.prevShot = this.game.time.now + 1000; // shooting penalty after revive 
 };
         
 var game;
@@ -231,6 +234,8 @@ var bullets_t2;
 var music;
 var player;
 var hud = [];
+var menu_text;
+var menu_group;
 
 function preload() {
     // preloading assets
@@ -281,13 +286,16 @@ function create() {
     player.damage = playerDamage;
     player.resurect = playerResurect;
     // TODO: change prototypes to function inheritance.
-    player.x = 1000;
-    player.y = 1000;
+    
+    player.alive = false;
+    player.ship.kill();
+    
     
     game.camera.follow(player.ship);
     team1.push(player);
     
     render_hud();
+    createMenuHud();
     
 }
 
@@ -296,6 +304,7 @@ function render_hud() {
     for(var i=0;i<config.health;i++) {
         var life = game.add.sprite(i*50 + 10, 10, 'hud_life');
         life.fixedToCamera = true;
+        life.kill();
         hud.push(life);
     }
 }
@@ -357,6 +366,19 @@ function render() {
     
 }
 
+function createMenuHud() {
+    menu_text = game.add.text(game.width/2, game.height/2, "Press Space to start", { font: '30px Arial', fill: '#fff'});
+    var gameTitle = game.add.text(game.width / 2, (game.height / 2) - menu_text.height - 50, "SpaceShips Battle", { font: '60px Arial', fill: '#fff'});
+
+    menu_text.anchor.setTo(0.5, 0.5);
+    gameTitle.anchor.setTo(0.5, 0.5);
+    menu_text.fixedToCamera = true;
+    gameTitle.fixedToCamera = true;
+    menu_group = game.add.group();
+    menu_group.add(gameTitle);
+    menu_group.add(menu_text);
+}
+
 function updateDetachedCamera() {
     var diff = config.cameraMovementDiff;
     if(cursors.left.isDown) {
@@ -382,6 +404,7 @@ function updateDetachedCamera() {
             player.shot();
         } else {
             player.resurect();
+            menu_group.alpha = 0;
         }
     }
     

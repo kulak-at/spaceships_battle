@@ -36,6 +36,10 @@ function preload() {
 }
 
 function create() {
+    
+    var loading = document.getElementById("loading");
+    loading.parentNode.removeChild(loading);
+    
     game.world.setBounds(-1000, -1000, 5000, 5000);
     
     land = game.add.tileSprite(0, 0, game.width, game.height, 'bg_stars');

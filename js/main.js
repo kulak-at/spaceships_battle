@@ -30,7 +30,7 @@ function preload() {
     game.load.image('shot_t2'  , 'assets/laserGreenShot.png');
     game.load.image('hud_life' , 'assets/life.png');
     
-    game.load.audio('soundtrack', 'assets/soundtrack.mp3'); // TODO: convert soundtrack to ogg 'cos Firefox doesn't support mp3s
+    game.load.audio('soundtrack', 'assets/soundtrack.mp3');
     game.load.audio('laser_t1', 'assets/Laser1.wav');
     game.load.audio('laser_t2', 'assets/Laser2.wav');
 }
